@@ -3,19 +3,46 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Hero3D } from '@/components/Hero3D';
 import { GeometryViewer } from '@/components/GeometryViewer';
+import { BiologyViewer } from '@/components/BiologyViewer';
+import { HistoryViewer } from '@/components/HistoryViewer';
 import { SubjectCards } from '@/components/SubjectCards';
 import { Eye, Zap, Globe, ArrowDown } from 'lucide-react';
 
 const Index = () => {
-  const [showGeometry, setShowGeometry] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<'geometry' | 'biology' | 'history' | null>(null);
 
-  const scrollToGeometry = () => {
-    setShowGeometry(true);
+  const scrollToDemo = () => {
+    setShowDemo(true);
+    setSelectedSubject('geometry');
     setTimeout(() => {
-      document.getElementById('geometry-section')?.scrollIntoView({ 
+      document.getElementById('demo-section')?.scrollIntoView({ 
         behavior: 'smooth' 
       });
     }, 100);
+  };
+
+  const handleSubjectSelect = (subject: 'geometry' | 'biology' | 'history') => {
+    setSelectedSubject(subject);
+    setShowDemo(true);
+    setTimeout(() => {
+      document.getElementById('demo-section')?.scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    }, 100);
+  };
+
+  const renderSubjectViewer = () => {
+    switch (selectedSubject) {
+      case 'geometry':
+        return <GeometryViewer />;
+      case 'biology':
+        return <BiologyViewer />;
+      case 'history':
+        return <HistoryViewer />;
+      default:
+        return <GeometryViewer />;
+    }
   };
 
   return (
@@ -49,7 +76,7 @@ const Index = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
           >
             <Button 
-              onClick={scrollToGeometry}
+              onClick={scrollToDemo}
               size="lg" 
               className="bg-gradient-primary glow border-transparent text-lg px-8 py-6 hover:shadow-intense transition-all duration-300"
             >
@@ -125,12 +152,12 @@ const Index = () => {
           </motion.div>
         </div>
 
-        <SubjectCards />
+        <SubjectCards onSubjectSelect={handleSubjectSelect} />
       </section>
 
-      {/* Interactive Geometry Section */}
-      {showGeometry && (
-        <section id="geometry-section" className="py-20 px-4 bg-gradient-card/10">
+      {/* Interactive Demo Section */}
+      {showDemo && (
+        <section id="demo-section" className="py-20 px-4 bg-gradient-card/10">
           <div className="max-w-6xl mx-auto text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -141,14 +168,48 @@ const Index = () => {
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
                 Interactive Demo
               </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Experience the power of 3D learning with our geometry visualization tool.
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+                Experience the power of 3D learning with our interactive visualization tools.
                 This is just a preview of what's possible with AR/VR education.
               </p>
+              
+              {/* Subject Navigation */}
+              <div className="flex flex-wrap justify-center gap-4 mb-8">
+                <Button
+                  onClick={() => setSelectedSubject('geometry')}
+                  variant={selectedSubject === 'geometry' ? 'default' : 'outline'}
+                  className={selectedSubject === 'geometry' 
+                    ? 'bg-gradient-primary glow border-primary/30' 
+                    : 'glass border-border/30 hover:border-primary/50'
+                  }
+                >
+                  Geometry
+                </Button>
+                <Button
+                  onClick={() => setSelectedSubject('biology')}
+                  variant={selectedSubject === 'biology' ? 'default' : 'outline'}
+                  className={selectedSubject === 'biology' 
+                    ? 'bg-gradient-secondary glow border-secondary/30' 
+                    : 'glass border-border/30 hover:border-secondary/50'
+                  }
+                >
+                  Biology & Anatomy
+                </Button>
+                <Button
+                  onClick={() => setSelectedSubject('history')}
+                  variant={selectedSubject === 'history' ? 'default' : 'outline'}
+                  className={selectedSubject === 'history' 
+                    ? 'bg-gradient-card glow border-accent/30' 
+                    : 'glass border-border/30 hover:border-accent/50'
+                  }
+                >
+                  History & Architecture
+                </Button>
+              </div>
             </motion.div>
           </div>
 
-          <GeometryViewer />
+          {renderSubjectViewer()}
         </section>
       )}
     </div>

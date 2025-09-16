@@ -37,7 +37,7 @@ const subjects: Subject[] = [
       'Organ system interactions',
       'Molecular visualization'
     ],
-    available: false
+    available: true
   },
   {
     title: 'History & Architecture',
@@ -50,11 +50,11 @@ const subjects: Subject[] = [
       'Cultural artifacts',
       'Timeline visualization'
     ],
-    available: false
+    available: true
   }
 ];
 
-export const SubjectCards = () => {
+export const SubjectCards = ({ onSubjectSelect }: { onSubjectSelect?: (subject: 'geometry' | 'biology' | 'history') => void }) => {
   return (
     <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
       {subjects.map((subject, index) => {
@@ -105,6 +105,16 @@ export const SubjectCards = () => {
 
                 <Button 
                   variant={subject.available ? "default" : "outline"}
+                  onClick={() => {
+                    if (subject.available && onSubjectSelect) {
+                      const subjectMap = {
+                        'Geometry': 'geometry' as const,
+                        'Biology & Anatomy': 'biology' as const,
+                        'History & Architecture': 'history' as const
+                      };
+                      onSubjectSelect(subjectMap[subject.title as keyof typeof subjectMap]);
+                    }
+                  }}
                   className={`w-full mt-4 ${
                     subject.available 
                       ? `bg-gradient-${subject.color} glow border-transparent hover:shadow-intense` 
