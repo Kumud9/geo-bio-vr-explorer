@@ -26,7 +26,7 @@ const AnimatedPyramid = () => {
 
   return (
     <group>
-      {/* Main pyramid */}
+      {/* Main pyramid structure */}
       <mesh ref={meshRef} position={[0, 0.5, 0]}>
         <coneGeometry args={[2, 2, 4]} />
         <meshStandardMaterial 
@@ -36,11 +36,28 @@ const AnimatedPyramid = () => {
         />
         <lineSegments>
           <edgesGeometry args={[new THREE.ConeGeometry(2, 2, 4)]} />
-          <lineBasicMaterial color="#b8956a" />
+          <lineBasicMaterial color="#b8956a" linewidth={2} />
         </lineSegments>
       </mesh>
       
-      {/* Base platform */}
+      {/* Limestone blocks texture */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const angle = (i * Math.PI * 2) / 12;
+        const radius = 1.8 - (i % 3) * 0.3;
+        const height = -0.3 + (i % 3) * 0.2;
+        return (
+          <mesh key={i} position={[
+            Math.cos(angle) * radius,
+            height,
+            Math.sin(angle) * radius
+          ]}>
+            <boxGeometry args={[0.15, 0.1, 0.15]} />
+            <meshStandardMaterial color="#c19b61" roughness={0.9} />
+          </mesh>
+        );
+      })}
+      
+      {/* Base platform with foundation stones */}
       <mesh ref={baseRef} position={[0, -0.8, 0]}>
         <cylinderGeometry args={[2.5, 2.5, 0.3, 8]} />
         <meshStandardMaterial 
@@ -50,15 +67,60 @@ const AnimatedPyramid = () => {
         />
       </mesh>
       
-      {/* Small surrounding structures */}
+      {/* Corner foundation markers */}
       {Array.from({ length: 4 }).map((_, i) => (
+        <mesh key={i} position={[
+          Math.cos(i * Math.PI / 2) * 2.3,
+          -0.65,
+          Math.sin(i * Math.PI / 2) * 2.3
+        ]}>
+          <boxGeometry args={[0.2, 0.1, 0.2]} />
+          <meshStandardMaterial color="#a67c5a" roughness={0.9} />
+        </mesh>
+      ))}
+      
+      {/* Inner chamber indicator */}
+      <mesh position={[0, 0.2, 0]}>
+        <boxGeometry args={[0.4, 0.3, 0.6]} />
+        <meshStandardMaterial 
+          color="#8d7053" 
+          transparent 
+          opacity={0.6} 
+          roughness={0.8} 
+        />
+      </mesh>
+      
+      {/* Entrance passage */}
+      <mesh position={[1.5, -0.2, 0]} rotation={[0, 0, -Math.PI / 6]}>
+        <cylinderGeometry args={[0.15, 0.15, 1, 8]} />
+        <meshStandardMaterial 
+          color="#5a4a3a" 
+          transparent 
+          opacity={0.8} 
+        />
+      </mesh>
+      
+      {/* Capstone (pyramidion) */}
+      <mesh position={[0, 1.4, 0]}>
+        <coneGeometry args={[0.15, 0.3, 4]} />
+        <meshStandardMaterial 
+          color="#FFD700" 
+          roughness={0.2} 
+          metalness={0.8}
+          emissive="#FFD700"
+          emissiveIntensity={0.2}
+        />
+      </mesh>
+      
+      {/* Smaller satellite pyramids */}
+      {Array.from({ length: 3 }).map((_, i) => (
         <Float key={i} speed={0.5} rotationIntensity={0.1} floatIntensity={0.05}>
           <mesh position={[
-            Math.cos(i * Math.PI / 2) * 3.2,
-            -0.4,
-            Math.sin(i * Math.PI / 2) * 3.2
+            Math.cos(i * Math.PI * 2 / 3 + Math.PI) * 3.5,
+            -0.2,
+            Math.sin(i * Math.PI * 2 / 3 + Math.PI) * 3.5
           ]}>
-            <coneGeometry args={[0.3, 0.8, 4]} />
+            <coneGeometry args={[0.4, 0.8, 4]} />
             <meshStandardMaterial color="#b8956a" roughness={0.8} metalness={0.1} />
           </mesh>
         </Float>
@@ -129,35 +191,118 @@ const AnimatedParthenon = () => {
 
   return (
     <group ref={meshRef}>
-      {/* Base platform */}
+      {/* Multi-level base (stylobate) */}
+      <mesh position={[0, -0.6, 0]}>
+        <boxGeometry args={[4.2, 0.2, 2.7]} />
+        <meshStandardMaterial color="#e8e8e8" roughness={0.7} metalness={0.2} />
+      </mesh>
       <mesh position={[0, -0.5, 0]}>
         <boxGeometry args={[4, 0.3, 2.5]} />
         <meshStandardMaterial color="#f0f0f0" roughness={0.7} metalness={0.2} />
       </mesh>
       
-      {/* Columns */}
+      {/* Doric columns with entasis (slight curve) */}
       {Array.from({ length: 12 }).map((_, i) => (
+        <group key={i}>
+          <mesh position={[
+            (i % 6 - 2.5) * 0.6,
+            0.3,
+            i < 6 ? -1 : 1
+          ]}>
+            <cylinderGeometry args={[0.08, 0.1, 1.6, 12]} />
+            <meshStandardMaterial color="#f5f5f5" roughness={0.6} metalness={0.2} />
+          </mesh>
+          
+          {/* Column capitals */}
+          <mesh position={[
+            (i % 6 - 2.5) * 0.6,
+            1.15,
+            i < 6 ? -1 : 1
+          ]}>
+            <cylinderGeometry args={[0.12, 0.08, 0.15, 12]} />
+            <meshStandardMaterial color="#f0f0f0" roughness={0.6} metalness={0.2} />
+          </mesh>
+          
+          {/* Column bases */}
+          <mesh position={[
+            (i % 6 - 2.5) * 0.6,
+            -0.35,
+            i < 6 ? -1 : 1
+          ]}>
+            <cylinderGeometry args={[0.12, 0.1, 0.1, 12]} />
+            <meshStandardMaterial color="#e8e8e8" roughness={0.7} metalness={0.2} />
+          </mesh>
+        </group>
+      ))}
+      
+      {/* Architrave (beam above columns) */}
+      <mesh position={[0, 1.35, 0]}>
+        <boxGeometry args={[4.2, 0.15, 2.7]} />
+        <meshStandardMaterial color="#e0e0e0" roughness={0.7} metalness={0.2} />
+      </mesh>
+      
+      {/* Frieze with metopes */}
+      <mesh position={[0, 1.5, 0]}>
+        <boxGeometry args={[4.2, 0.2, 2.7]} />
+        <meshStandardMaterial color="#d8d8d8" roughness={0.7} metalness={0.2} />
+      </mesh>
+      
+      {/* Metope decorations */}
+      {Array.from({ length: 8 }).map((_, i) => (
         <mesh key={i} position={[
-          (i % 6 - 2.5) * 0.6,
-          0.3,
-          i < 6 ? -1 : 1
+          (i - 3.5) * 0.4,
+          1.5,
+          1.36
         ]}>
-          <cylinderGeometry args={[0.08, 0.08, 1.6, 12]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.6} metalness={0.2} />
+          <boxGeometry args={[0.3, 0.15, 0.05]} />
+          <meshStandardMaterial color="#c0c0c0" roughness={0.8} metalness={0.1} />
         </mesh>
       ))}
       
-      {/* Roof */}
-      <mesh position={[0, 1.3, 0]}>
-        <boxGeometry args={[4.2, 0.2, 2.7]} />
-        <meshStandardMaterial color="#e8e8e8" roughness={0.7} metalness={0.2} />
+      {/* Roof structure */}
+      <mesh position={[0, 1.7, 0]}>
+        <boxGeometry args={[4.4, 0.1, 2.9]} />
+        <meshStandardMaterial color="#d0d0d0" roughness={0.8} metalness={0.1} />
       </mesh>
       
-      {/* Triangular pediment */}
-      <mesh position={[0, 1.6, -1.35]} rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[2.1, 0.4, 3]} />
+      {/* Triangular pediments */}
+      <mesh position={[0, 1.9, -1.45]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[2.2, 0.4, 3]} />
         <meshStandardMaterial color="#e0e0e0" roughness={0.7} metalness={0.2} />
       </mesh>
+      <mesh position={[0, 1.9, 1.45]} rotation={[-Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[2.2, 0.4, 3]} />
+        <meshStandardMaterial color="#e0e0e0" roughness={0.7} metalness={0.2} />
+      </mesh>
+      
+      {/* Cella (inner chamber) walls */}
+      <mesh position={[0, 0.5, 0]}>
+        <boxGeometry args={[2.5, 1, 1.8]} />
+        <meshStandardMaterial 
+          color="#f8f8f8" 
+          transparent 
+          opacity={0.7} 
+          roughness={0.6} 
+        />
+      </mesh>
+      
+      {/* Athena statue pedestal */}
+      <mesh position={[0, 0.2, 0.3]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.4, 8]} />
+        <meshStandardMaterial color="#FFD700" roughness={0.3} metalness={0.7} />
+      </mesh>
+      
+      {/* Roof tiles pattern */}
+      {Array.from({ length: 20 }).map((_, i) => (
+        <mesh key={i} position={[
+          (i % 10 - 4.5) * 0.4,
+          1.75,
+          (Math.floor(i / 10) - 0.5) * 0.3
+        ]}>
+          <boxGeometry args={[0.3, 0.02, 0.25]} />
+          <meshStandardMaterial color="#c8c8c8" roughness={0.9} />
+        </mesh>
+      ))}
     </group>
   );
 };
@@ -229,49 +374,49 @@ const sites: HistoricalSite[] = [
   {
     name: 'Great Pyramid of Giza',
     component: AnimatedPyramid,
-    description: 'One of the Seven Wonders of the Ancient World, built as a tomb for Pharaoh Khufu.',
+    description: 'Detailed reconstruction showing limestone blocks, inner chambers, entrance passage, golden capstone, and satellite pyramids.',
     period: '2580-2510 BCE',
     facts: [
-      'Originally 146.5 meters tall',
-      'Built with over 2 million stone blocks',
-      'Aligned with cardinal directions',
-      'Construction took approximately 20 years'
+      'Limestone blocks: Over 2.3 million stones weighing 2.5-15 tons each',
+      'Inner chambers: King\'s chamber, Queen\'s chamber, and Grand Gallery',
+      'Entrance passage: Originally sealed and hidden on the north face',
+      'Golden capstone (pyramidion): May have been covered in electrum'
     ]
   },
   {
     name: 'Roman Colosseum',
     component: AnimatedColosseum,
-    description: 'The largest amphitheater ever built, used for gladiatorial contests and public spectacles.',
+    description: 'The largest amphitheater showing the arena floor, tiered seating, underground hypogeum, and architectural arches.',
     period: '70-80 CE',
     facts: [
-      'Could hold 50,000-80,000 spectators',
-      'Had a complex underground area called hypogeum',
-      'Featured a retractable awning system',
-      'Hosted mock naval battles called naumachiae'
+      'Arena floor: Wooden platform covered with sand to absorb blood',
+      'Hypogeum: Underground complex with lifts and trap doors',
+      'Velarium: Retractable awning system operated by sailors',
+      'Travertine stone: Primary building material from Tivoli quarries'
     ]
   },
   {
     name: 'Parthenon',
     component: AnimatedParthenon,
-    description: 'A temple dedicated to Athena, representing the pinnacle of ancient Greek architecture.',
+    description: 'Authentic Doric temple showing columns with entasis, stylobate base, frieze with metopes, pediments, and inner cella.',
     period: '447-432 BCE',
     facts: [
-      'Built on the Athenian Acropolis',
-      'Made primarily of Pentelic marble',
-      'Used optical illusions to appear perfectly straight',
-      'Housed a 12-meter tall statue of Athena'
+      'Doric columns: 46 columns with subtle entasis (bulge) for optical illusion',
+      'Stylobate: Three-step marble platform with precise mathematical proportions',
+      'Metopes & Frieze: Sculptural decorations depicting mythological battles',
+      'Cella: Inner chamber that housed Phidias\' 12-meter gold-ivory Athena statue'
     ]
   },
   {
     name: 'Stonehenge',
     component: AnimatedStonehenge,
-    description: 'A prehistoric monument consisting of a ring of standing stones, possibly used for astronomical observations.',
+    description: 'Prehistoric monument showing the outer sarsen circle, inner trilithons, heel stone, and altar stone arrangement.',
     period: '3100-1600 BCE',
     facts: [
-      'Stones were transported from Wales, 240 km away',
-      'Aligned with solstices and equinoxes',
-      'Built in several phases over 1500 years',
-      'Purpose remains largely mysterious'
+      'Sarsen stones: Outer circle of 30 upright stones with lintels',
+      'Trilithons: Five massive doorway-like structures in horseshoe formation',
+      'Heel Stone: Marker stone aligned with sunrise on summer solstice',
+      'Bluestones: Inner circle stones transported from Wales, 240km away'
     ]
   }
 ];

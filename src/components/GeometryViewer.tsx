@@ -22,20 +22,61 @@ const AnimatedCube = () => {
   });
 
   return (
-    <mesh ref={meshRef} position={[0, 0, 0]}>
-      <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial 
-        color="#8B5CF6" 
-        transparent 
-        opacity={0.8}
-        roughness={0.1}
-        metalness={0.2}
-      />
-      <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(2, 2, 2)]} />
-        <lineBasicMaterial color="#C4B5FD" />
-      </lineSegments>
-    </mesh>
+    <group>
+      {/* Main cube */}
+      <mesh ref={meshRef} position={[0, 0, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial 
+          color="#8B5CF6" 
+          transparent 
+          opacity={0.8}
+          roughness={0.1}
+          metalness={0.2}
+        />
+        <lineSegments>
+          <edgesGeometry args={[new THREE.BoxGeometry(2, 2, 2)]} />
+          <lineBasicMaterial color="#C4B5FD" linewidth={2} />
+        </lineSegments>
+      </mesh>
+      
+      {/* Vertex markers - 8 vertices of cube */}
+      {[
+        [-1, -1, -1] as [number, number, number], 
+        [1, -1, -1] as [number, number, number], 
+        [1, 1, -1] as [number, number, number], 
+        [-1, 1, -1] as [number, number, number],
+        [-1, -1, 1] as [number, number, number], 
+        [1, -1, 1] as [number, number, number], 
+        [1, 1, 1] as [number, number, number], 
+        [-1, 1, 1] as [number, number, number]
+      ].map((pos, i) => (
+        <mesh key={i} position={pos}>
+          <sphereGeometry args={[0.08, 8, 8]} />
+          <meshStandardMaterial color="#FFD700" />
+        </mesh>
+      ))}
+      
+      {/* Center point */}
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[0.06, 8, 8]} />
+        <meshStandardMaterial color="#FF4444" emissive="#FF4444" emissiveIntensity={0.3} />
+      </mesh>
+      
+      {/* Face center markers - 6 faces */}
+      {[
+        [0, 0, 1] as [number, number, number], 
+        [0, 0, -1] as [number, number, number], 
+        [0, 1, 0] as [number, number, number], 
+        [0, -1, 0] as [number, number, number], 
+        [1, 0, 0] as [number, number, number], 
+        [-1, 0, 0] as [number, number, number]
+      ].map((pos, i) => (
+        <mesh key={i} position={pos}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshStandardMaterial color="#00FF88" />
+        </mesh>
+      ))}
+    </group>
   );
 };
 
@@ -48,16 +89,56 @@ const AnimatedSphere = () => {
   });
 
   return (
-    <mesh ref={meshRef}>
-      <sphereGeometry args={[1.5, 32, 32]} />
-      <meshStandardMaterial 
-        color="#A855F7" 
-        transparent 
-        opacity={0.8}
-        roughness={0.1}
-        metalness={0.3}
-      />
-    </mesh>
+    <group>
+      {/* Main sphere */}
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[1.5, 32, 32]} />
+        <meshStandardMaterial 
+          color="#A855F7" 
+          transparent 
+          opacity={0.8}
+          roughness={0.1}
+          metalness={0.3}
+        />
+      </mesh>
+      
+      {/* Center point */}
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[0.06, 8, 8]} />
+        <meshStandardMaterial color="#FF4444" emissive="#FF4444" emissiveIntensity={0.3} />
+      </mesh>
+      
+      {/* Radius indicators */}
+      {Array.from({ length: 6 }).map((_, i) => {
+        const angle = (i * Math.PI) / 3;
+        return (
+          <group key={i}>
+            <mesh position={[Math.cos(angle) * 1.5, 0, Math.sin(angle) * 1.5]}>
+              <sphereGeometry args={[0.05, 8, 8]} />
+              <meshStandardMaterial color="#FFD700" />
+            </mesh>
+            {/* Radius lines */}
+            <mesh 
+              position={[Math.cos(angle) * 0.75, 0, Math.sin(angle) * 0.75]} 
+              rotation={[0, angle, Math.PI / 2]}
+            >
+              <cylinderGeometry args={[0.01, 0.01, 1.5, 8]} />
+              <meshStandardMaterial color="#00FF88" opacity={0.6} transparent />
+            </mesh>
+          </group>
+        );
+      })}
+      
+      {/* Great circles */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[1.5, 0.02, 8, 32]} />
+        <meshStandardMaterial color="#C4B5FD" opacity={0.7} transparent />
+      </mesh>
+      <mesh rotation={[0, Math.PI / 2, 0]}>
+        <torusGeometry args={[1.5, 0.02, 8, 32]} />
+        <meshStandardMaterial color="#C4B5FD" opacity={0.7} transparent />
+      </mesh>
+    </group>
   );
 };
 
@@ -70,20 +151,71 @@ const AnimatedPyramid = () => {
   });
 
   return (
-    <mesh ref={meshRef}>
-      <coneGeometry args={[1.5, 3, 4]} />
-      <meshStandardMaterial 
-        color="#C084FC" 
-        transparent 
-        opacity={0.8}
-        roughness={0.1}
-        metalness={0.2}
-      />
-      <lineSegments>
-        <edgesGeometry args={[new THREE.ConeGeometry(1.5, 3, 4)]} />
-        <lineBasicMaterial color="#DDD6FE" />
-      </lineSegments>
-    </mesh>
+    <group>
+      {/* Main pyramid */}
+      <mesh ref={meshRef}>
+        <coneGeometry args={[1.5, 3, 4]} />
+        <meshStandardMaterial 
+          color="#C084FC" 
+          transparent 
+          opacity={0.8}
+          roughness={0.1}
+          metalness={0.2}
+        />
+        <lineSegments>
+          <edgesGeometry args={[new THREE.ConeGeometry(1.5, 3, 4)]} />
+          <lineBasicMaterial color="#DDD6FE" linewidth={2} />
+        </lineSegments>
+      </mesh>
+      
+      {/* Apex (top vertex) */}
+      <mesh position={[0, 1.5, 0]}>
+        <sphereGeometry args={[0.08, 8, 8]} />
+        <meshStandardMaterial color="#FFD700" />
+      </mesh>
+      
+      {/* Base vertices */}
+      {[
+        [1.5, -1.5, 0] as [number, number, number], 
+        [-1.5, -1.5, 0] as [number, number, number], 
+        [0, -1.5, 1.5] as [number, number, number], 
+        [0, -1.5, -1.5] as [number, number, number]
+      ].map((pos, i) => (
+        <mesh key={i} position={pos}>
+          <sphereGeometry args={[0.08, 8, 8]} />
+          <meshStandardMaterial color="#FFD700" />
+        </mesh>
+      ))}
+      
+      {/* Base center */}
+      <mesh position={[0, -1.5, 0]}>
+        <sphereGeometry args={[0.06, 8, 8]} />
+        <meshStandardMaterial color="#FF4444" />
+      </mesh>
+      
+      {/* Height line */}
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.01, 0.01, 3, 8]} />
+        <meshStandardMaterial color="#00FF88" opacity={0.8} transparent />
+      </mesh>
+      
+      {/* Slant height indicators */}
+      {Array.from({ length: 4 }).map((_, i) => {
+        const angle = (i * Math.PI) / 2;
+        const x = Math.cos(angle) * 0.75;
+        const z = Math.sin(angle) * 0.75;
+        return (
+          <mesh 
+            key={i}
+            position={[x, 0, z]} 
+            rotation={[0, angle, Math.atan(3 / 1.5)]}
+          >
+            <cylinderGeometry args={[0.008, 0.008, Math.sqrt(3*3 + 1.5*1.5), 8]} />
+            <meshStandardMaterial color="#FFA500" opacity={0.6} transparent />
+          </mesh>
+        );
+      })}
+    </group>
   );
 };
 
@@ -242,17 +374,17 @@ const shapes: GeometryShape[] = [
   {
     name: 'Cube',
     component: AnimatedCube,
-    description: 'A three-dimensional shape with 6 equal square faces, 12 edges, and 8 vertices. Also known as a hexahedron.'
+    description: 'A polyhedron with 6 square faces, 12 edges, and 8 vertices. Gold spheres mark vertices, green spheres mark face centers, and red marks the centroid.'
   },
   {
     name: 'Sphere',
     component: AnimatedSphere,
-    description: 'A perfectly round 3D shape where every point on the surface is equidistant from the center.'
+    description: 'A perfectly round 3D shape. Gold points mark surface locations, green lines show radii, and purple circles represent great circles through the center.'
   },
   {
     name: 'Pyramid',
     component: AnimatedPyramid,
-    description: 'A polyhedron formed by connecting a polygonal base and a point (apex). This is a square pyramid.'
+    description: 'A square pyramid with 5 faces, 8 edges, and 5 vertices. Gold spheres mark vertices, green line shows height, orange lines show slant heights.'
   },
   {
     name: 'Torus',
