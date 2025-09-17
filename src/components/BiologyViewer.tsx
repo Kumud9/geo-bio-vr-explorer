@@ -18,27 +18,66 @@ const AnimatedHeart = () => {
   const meshRef = useRef<THREE.Group>(null!);
   
   useFrame((state, delta) => {
-    meshRef.current.rotation.y += delta * 0.3;
-    // Heartbeat effect
-    const scale = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
-    meshRef.current.scale.setScalar(scale);
+    meshRef.current.rotation.y += delta * 0.2;
+    // Realistic heartbeat effect
+    const heartbeat = 1 + Math.sin(state.clock.elapsedTime * 4) * 0.05 + 
+                     Math.sin(state.clock.elapsedTime * 8) * 0.03;
+    meshRef.current.scale.setScalar(heartbeat);
   });
 
   return (
     <group ref={meshRef}>
-      {/* Heart shape using two spheres and a rotated cube */}
-      <mesh position={[-0.5, 0.5, 0]}>
-        <sphereGeometry args={[0.6, 32, 32]} />
+      {/* Left Atrium */}
+      <mesh position={[-0.4, 0.8, 0.2]}>
+        <sphereGeometry args={[0.35, 16, 16]} />
+        <meshStandardMaterial color="#8b0000" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Right Atrium */}
+      <mesh position={[0.4, 0.8, 0.2]}>
+        <sphereGeometry args={[0.35, 16, 16]} />
+        <meshStandardMaterial color="#8b0000" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Left Ventricle */}
+      <mesh position={[-0.3, 0.1, 0]} rotation={[0.2, 0, -0.1]}>
+        <coneGeometry args={[0.45, 1.2, 12]} />
         <meshStandardMaterial color="#dc2626" roughness={0.3} metalness={0.1} />
       </mesh>
-      <mesh position={[0.5, 0.5, 0]}>
-        <sphereGeometry args={[0.6, 32, 32]} />
+      
+      {/* Right Ventricle */}
+      <mesh position={[0.35, 0.1, 0.1]} rotation={[0.2, 0, 0.1]}>
+        <coneGeometry args={[0.4, 1.1, 12]} />
         <meshStandardMaterial color="#dc2626" roughness={0.3} metalness={0.1} />
       </mesh>
-      <mesh position={[0, -0.2, 0]} rotation={[0, 0, Math.PI / 4]}>
-        <boxGeometry args={[1.2, 1.2, 0.8]} />
-        <meshStandardMaterial color="#dc2626" roughness={0.3} metalness={0.1} />
+      
+      {/* Aorta */}
+      <mesh position={[-0.2, 1.3, 0]} rotation={[0, 0, 0.3]}>
+        <cylinderGeometry args={[0.15, 0.18, 0.8, 8]} />
+        <meshStandardMaterial color="#a91e22" roughness={0.3} metalness={0.1} />
       </mesh>
+      
+      {/* Pulmonary Artery */}
+      <mesh position={[0.2, 1.2, 0.2]} rotation={[0, 0, -0.2]}>
+        <cylinderGeometry args={[0.12, 0.15, 0.6, 8]} />
+        <meshStandardMaterial color="#a91e22" roughness={0.3} metalness={0.1} />
+      </mesh>
+      
+      {/* Coronary Arteries */}
+      {Array.from({ length: 6 }).map((_, i) => (
+        <mesh 
+          key={i}
+          position={[
+            Math.cos(i * Math.PI / 3) * 0.5,
+            0.4 + Math.sin(i * Math.PI / 3) * 0.2,
+            Math.sin(i * Math.PI / 3) * 0.3
+          ]}
+          rotation={[i * 0.3, i * 0.5, 0]}
+        >
+          <cylinderGeometry args={[0.02, 0.03, 0.4, 6]} />
+          <meshStandardMaterial color="#ff4444" roughness={0.2} metalness={0.2} />
+        </mesh>
+      ))}
     </group>
   );
 };
@@ -47,26 +86,64 @@ const AnimatedBrain = () => {
   const meshRef = useRef<THREE.Group>(null!);
   
   useFrame((state, delta) => {
-    meshRef.current.rotation.y += delta * 0.2;
-    meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+    meshRef.current.rotation.y += delta * 0.15;
+    meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.05;
   });
 
   return (
     <group ref={meshRef}>
-      {/* Brain hemispheres */}
-      <mesh position={[-0.4, 0, 0]}>
-        <sphereGeometry args={[0.8, 16, 16]} />
-        <meshStandardMaterial color="#f59e0b" roughness={0.4} metalness={0.2} />
+      {/* Cerebrum - Left Hemisphere */}
+      <mesh position={[-0.5, 0.2, 0]} scale={[1, 1.1, 0.9]}>
+        <sphereGeometry args={[0.7, 20, 16]} />
+        <meshStandardMaterial color="#f4a261" roughness={0.6} metalness={0.1} />
       </mesh>
-      <mesh position={[0.4, 0, 0]}>
-        <sphereGeometry args={[0.8, 16, 16]} />
-        <meshStandardMaterial color="#f59e0b" roughness={0.4} metalness={0.2} />
+      
+      {/* Cerebrum - Right Hemisphere */}
+      <mesh position={[0.5, 0.2, 0]} scale={[1, 1.1, 0.9]}>
+        <sphereGeometry args={[0.7, 20, 16]} />
+        <meshStandardMaterial color="#f4a261" roughness={0.6} metalness={0.1} />
       </mesh>
-      {/* Brain stem */}
-      <mesh position={[0, -0.8, 0]}>
-        <cylinderGeometry args={[0.2, 0.3, 0.8, 8]} />
-        <meshStandardMaterial color="#d97706" roughness={0.4} metalness={0.2} />
+      
+      {/* Corpus Callosum (connection between hemispheres) */}
+      <mesh position={[0, 0.1, 0]} scale={[0.8, 0.2, 0.6]}>
+        <boxGeometry args={[0.3, 0.1, 0.8]} />
+        <meshStandardMaterial color="#e76f51" roughness={0.4} metalness={0.2} />
       </mesh>
+      
+      {/* Cerebellum */}
+      <mesh position={[0, -0.4, -0.6]} scale={[0.8, 0.6, 0.7]}>
+        <sphereGeometry args={[0.4, 16, 12]} />
+        <meshStandardMaterial color="#d4a574" roughness={0.5} metalness={0.1} />
+      </mesh>
+      
+      {/* Brain Stem */}
+      <mesh position={[0, -0.8, -0.3]} rotation={[0.2, 0, 0]}>
+        <cylinderGeometry args={[0.15, 0.25, 0.8, 12]} />
+        <meshStandardMaterial color="#c97d47" roughness={0.4} metalness={0.2} />
+      </mesh>
+      
+      {/* Frontal Lobe details */}
+      <mesh position={[0, 0.6, 0.4]} scale={[1.2, 0.5, 0.8]}>
+        <sphereGeometry args={[0.3, 12, 8]} />
+        <meshStandardMaterial color="#f4a261" roughness={0.7} metalness={0.05} />
+      </mesh>
+      
+      {/* Sulci (brain folds) - represented as grooves */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <mesh 
+          key={i}
+          position={[
+            (i % 2 === 0 ? -0.5 : 0.5) + (Math.random() - 0.5) * 0.3,
+            0.2 + Math.sin(i * Math.PI / 4) * 0.4,
+            Math.cos(i * Math.PI / 4) * 0.6
+          ]}
+          rotation={[Math.PI / 2, i * Math.PI / 4, 0]}
+          scale={[0.8, 0.05, 0.1]}
+        >
+          <torusGeometry args={[0.2, 0.02, 6, 12]} />
+          <meshStandardMaterial color="#e76f51" roughness={0.5} metalness={0.1} />
+        </mesh>
+      ))}
     </group>
   );
 };
@@ -171,23 +248,23 @@ const models: BiologyModel[] = [
   {
     name: 'Human Heart',
     component: AnimatedHeart,
-    description: 'The muscular organ that pumps blood throughout the body via the circulatory system.',
+    description: 'A detailed 3D model of the human heart showing the four chambers, major vessels, and coronary arteries.',
     facts: [
-      'Beats about 100,000 times per day',
-      'Pumps about 2,000 gallons of blood daily',
-      'Has four chambers: two atria and two ventricles',
-      'The heart muscle never rests during a lifetime'
+      'Has 4 chambers: 2 atria (upper) and 2 ventricles (lower)',
+      'Left ventricle is the strongest chamber, pumping blood to the body',
+      'Coronary arteries supply blood to the heart muscle itself',
+      'Beats approximately 100,000 times per day'
     ]
   },
   {
     name: 'Human Brain',
     component: AnimatedBrain,
-    description: 'The control center of the nervous system, responsible for thoughts, emotions, and bodily functions.',
+    description: 'An anatomically accurate brain model showing cerebrum hemispheres, cerebellum, brain stem, and major structures.',
     facts: [
-      'Contains approximately 86 billion neurons',
-      'Uses about 20% of the body\'s energy',
-      'Has two hemispheres connected by corpus callosum',
-      'Weighs about 3 pounds in adults'
+      'Cerebrum has left and right hemispheres connected by corpus callosum',
+      'Cerebellum controls balance and coordination',
+      'Brain stem controls vital functions like breathing and heart rate',
+      'Contains over 86 billion neurons with trillions of connections'
     ]
   },
   {
